@@ -1,126 +1,100 @@
-package up.mi.mm;
+package up.mi.mm.projet;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
-
 public class TestCA {
-
+	
 	public static void main(String [] args) {
-
 		int nbVilles;
-
 		int reponse;
-
-		boolean vrai = false;
-
-		
-
 		Scanner scanner=new Scanner(System.in);
-
-		System.out.println("Saisir le nb de villes");
-
-		nbVilles=scanner.nextInt();
-
-		CA communaute=new CA(nbVilles);
-
-		communaute.remplirMatrice();
-
 		
-
-		while(vrai==false) {
-
-			System.out.println("Tapez: \n"
-
-					+ "1 ajouter une route \n"
-
-					+ "2 fin");
-
-			reponse=scanner.nextInt();
-
-			if(reponse==1) {
-
-				int v1,v2;
-
-				System.out.println("Le numero de la ville source");
-
-				v1=scanner.nextInt();
-
-				System.out.println("Le numero de la ville cible");
-
-				v2=scanner.nextInt();
-
-				communaute.ajouterArete(v1, v2);
-
-			} else if (reponse==2) {
-
-				vrai=true;
-
-			} else {
-
-				System.out.println("Saisir a nouveau");
-
-			}
-
+		try {
+			nbVilles = lectureEntier(scanner,"Saisir le nombre de villes: ");
+			CA communaute = new CA(nbVilles);
+			communaute.remplirMatrice();
+			communaute.RemplirBornesDeRecharge();
+			do { 
+				menu1();
+				reponse = lectureEntier(scanner,"Votre choix: ");
+				switch(reponse) {
+				case 1:
+					try {
+						int ville1,ville2;
+						ville1=lectureEntier(scanner, "Le numero de la ville source: ");
+						ville2=lectureEntier(scanner, "Le numero de la ville cible: ");
+						communaute.ajouterArete(ville1, ville2);
+						break;
+					} catch (InvalidInputException e ) {
+						System.out.println(e.getMessage());
+					}
+				case 2: 
+					break;
+				default: 
+					System.out.println("Votre choix "+ reponse+ " n'est pas valide");
+				}
+			}while (reponse != 2);
+			
+			do {
+				menu2();
+				reponse = lectureEntier(scanner,"Votre choix: ");
+				switch(reponse) {
+				case 1:
+					try {
+						int ville = lectureEntier(scanner,"Le numéro de la ville est: ");
+						communaute.ajouterBorneDeRecharge(ville);
+						break;
+					} catch (InvalidInputException e ) {
+						System.out.println(e.getMessage());
+					}
+				case 2:
+					try {
+						int ville1 = lectureEntier(scanner,"Le numéro de la ville est: ");
+						communaute.supprimerBorneRecharge(ville1);
+						break;
+					} catch (InvalidInputException e ) {
+						System.out.println(e.getMessage());
+					}
+				case 3: 
+					break;
+				default: 
+					System.out.println("Votre choix "+ reponse+ " n'est pas valide");
+				}
+			}while(reponse != 3);	
+		} catch (InvalidInputException e) {
+			System.out.println(e.getMessage());
 		}
-
-		
-
-		communaute.RemplirBornesDeRecharge();
-
-		
-
-		vrai=false;
-
-		while(vrai==false) {
-
-			System.out.println("Tapez: "
-
-					+ "1 ajouter une zone de recharge \n"
-
-					+ "2 retirer une zone de recharge \n"
-
-					+ "3 fin");
-
-			reponse=scanner.nextInt();
-
-			switch(reponse) {
-
-			case 1: 
-
-				System.out.println("le numero de la ville");
-
-				communaute.ajouterBorneDeRecharge(scanner.nextInt());
-
-				break;
-
-			case 2: 
-
-				System.out.println("le numero de la ville");
-
-				communaute.supprimerBorneRecharge(scanner.nextInt());
-
-				break;
-
-			case 3:
-
-				vrai=true;
-
-				break;
-
-			default:
-
-				break;
-
-			}
-
-		}
-
-		
-
-		scanner.close();
-
 	}
 
+		
+	private static int lectureEntier(Scanner scanner, String message) {
+		int res = 0;
+		boolean lectureValide = false;
+		while(!lectureValide) {
+			try {
+				System.out.println(message);
+				res=scanner.nextInt();
+				lectureValide=true;
+			} catch (InputMismatchException e) {
+				System.out.println("Il faut taper un nombre entier");
+				scanner.nextLine();				
+			}
+		}
+		return res;
+	}
 
-
+	
+	private static void menu1() {
+		System.out.println("Tapez: ");
+		System.out.println("1: Ajouter une route ");
+		System.out.println("2: Fin");
+	}
+	
+	private static void menu2() {
+		System.out.println("Tapez: ");
+		System.out.println("1: Ajouter une zone de recharge ");
+		System.out.println("2: Retirer une zone de recharge ");	
+		System.out.println("3: Fin");
+	}
+		
 }
