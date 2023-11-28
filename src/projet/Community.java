@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Community {
 	private ArrayList<String> cities;
-	private ArrayList<String[]> routes;
+	private ArrayList<Route> routes;
 	private ArrayList<String> rechargeZones;
 
 	public Community(int numberOfCities) {
@@ -19,8 +19,14 @@ public class Community {
 	}
 
 	public void addRoute(String city1, String city2) {
-		routes.add(new String[] { city1, city2 });
+	    if (cities.contains(city1) && cities.contains(city2)) {
+	        routes.add(new Route(city1, city2));
+	        System.out.println("Route ajoutée entre les villes " + city1 + " et " + city2 + ".");
+	    } else {
+	        System.out.println("Les villes spécifiées dans la route ne sont pas valides.");
+	    }
 	}
+
 
 	public void addRechargeZone(String city) {	
 		if (!rechargeZones.contains(city)) {
@@ -49,17 +55,19 @@ public class Community {
 	}
 
 	private boolean isAccessibilityPreserved(String removedCity) {
-		// Vérifier si la suppression de la zone de recharge de la ville violerait la
-		// contrainte d'Accessibilité
-		for (String[] route : routes) {
-			String city1 = route[0];
-			String city2 = route[1];
+	    for (Route route : routes) {
+	        String city1 = route.getCity1();
+	        String city2 = route.getCity2();
 
-			if ((rechargeZones.contains(city1) || rechargeZones.contains(city2))
-					&& !rechargeZones.contains(removedCity)) {
-				return true;
-			}
-		}
-		return false;
+	        if ((rechargeZones.contains(city1) && !rechargeZones.contains(city2))
+	                || (!rechargeZones.contains(city1) && rechargeZones.contains(city2))) {
+	            if (rechargeZones.contains(removedCity)) {
+	                return false; // Violation found, removal of the zone would break accessibility
+	            }
+	        }
+	    }
+	    return true; // No violation found, removal is allowed
 	}
+
+
 }
