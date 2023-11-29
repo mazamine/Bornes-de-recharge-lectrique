@@ -19,16 +19,22 @@ public class Community {
 	}
 
 	public void addRoute(String city1, String city2) {
-	    if (cities.contains(city1) && cities.contains(city2)) {
-	        routes.add(new Route(city1, city2));
-	        System.out.println("Route ajoutée entre les villes " + city1 + " et " + city2 + ".");
-	    } else {
-	        System.out.println("Les villes spécifiées dans la route ne sont pas valides.");
-	    }
+		if (cities.contains(city1) && cities.contains(city2)) {
+			for (Route route : routes) {
+				if ((route.getCity1().equals(city1) && route.getCity2().equals(city2))
+						|| (route.getCity1().equals(city2) && route.getCity2().equals(city1))) {
+					System.out.println("Cette route existe deja");
+					return;
+				}
+			}
+			routes.add(new Route(city1, city2));
+			System.out.println("Route ajoutée entre les villes " + city1 + " et " + city2 + ".");
+		} else {
+			System.out.println("Les villes spécifiées dans la route ne sont pas valides.");
+		}
 	}
 
-
-	public void addRechargeZone(String city) {	
+	public void addRechargeZone(String city) {
 		if (!rechargeZones.contains(city)) {
 			rechargeZones.add(city);
 			System.out.println("Zone de recharge ajoutée à la ville " + city + ".");
@@ -55,19 +61,18 @@ public class Community {
 	}
 
 	private boolean isAccessibilityPreserved(String removedCity) {
-	    for (Route route : routes) {
-	        String city1 = route.getCity1();
-	        String city2 = route.getCity2();
+		for (Route route : routes) {
+			String city1 = route.getCity1();
+			String city2 = route.getCity2();
 
-	        if ((rechargeZones.contains(city1) && !rechargeZones.contains(city2))
-	                || (!rechargeZones.contains(city1) && rechargeZones.contains(city2))) {
-	            if (rechargeZones.contains(removedCity)) {
-	                return false; // Violation found, removal of the zone would break accessibility
-	            }
-	        }
-	    }
-	    return true; // No violation found, removal is allowed
+			if ((rechargeZones.contains(city1) && !rechargeZones.contains(city2))
+					|| (!rechargeZones.contains(city1) && rechargeZones.contains(city2))) {
+				if (rechargeZones.contains(removedCity)) {
+					return false; // Violation found, removal of the zone would break accessibility
+				}
+			}
+		}
+		return true; // No violation found, removal is allowed
 	}
-
 
 }
