@@ -1,11 +1,13 @@
 package projet;
 
 import java.io.*;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
@@ -31,7 +33,7 @@ public class Main {
 
 		Community community = new Community();
 		
-		String fileName = "D:/h.txt";
+		String fileName = "/workspaces/Projet_PAA/src/h.txt";
 
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
@@ -46,7 +48,7 @@ public class Main {
 		
 		int choice = 0;
 		String cityName;
-
+/* 
 		while (true) {
 			System.out.println("\nMenu principal :");
 			System.out.println("1. Ajouter une Ville");
@@ -104,8 +106,11 @@ public class Main {
 				break;
 			}
 		}
+*/
 
 		System.out.println("\nConfiguration initiale avec une zone de recharge dans chaque ville :");
+
+		optimizeChargingZones(community.cities, community.routes);
 		community.displayRechargeZones();
 
 		while (true) {
@@ -144,10 +149,53 @@ public class Main {
 			community.displayRechargeZones();
 		}
 
+    
+        // Afficher le résultat
+        /*for (int i = 0; i < community.getCities().size(); i++){
+			System.out.println("")
+		}*/
+
 		scanner.close();
 		System.out.println("Merci d'utiliser le programme.");
 		System.exit(0);
 	}
+
+	public static void optimizeChargingZones(List<Ville> cities, List<Route> roads) {
+        for (Ville city : cities) {
+            if (!city.hasZoneDeRecharge()) {
+                Set<Ville> neighbors = findNeighbors(city, roads);
+                if (!canChargeInNeighbor(city, neighbors)) {
+                    city.setZoneDeRecharge(true);
+                    for (Ville neighbor : neighbors) {
+                        if (neighbor.hasZoneDeRecharge()) {
+                            neighbor.setZoneDeRecharge(false); ;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static Set<Ville> findNeighbors(Ville city, List<Route> roads) {
+        Set<Ville> neighbors = new HashSet<>();
+        for (Route road : roads) {
+            if (road.getCity1() == city) {
+                neighbors.add(road.getCity2());
+            } else if (road.getCity2() == city) {
+                neighbors.add(road.getCity1());
+            }
+        }
+        return neighbors;
+    }
+
+    private static boolean canChargeInNeighbor(Ville city, Set<Ville> neighbors) {
+        for (Ville neighbor : neighbors) {
+            if (neighbor.hasZoneDeRecharge()) {
+                return true;
+            }
+        }
+        return false;
+    }
 	
 	private static void executeCommand(String command, Community community) {
 		// Analyser la commande et extraire le nom de la fonction et les paramètres

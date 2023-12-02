@@ -3,8 +3,8 @@ package projet;
 import java.util.ArrayList;
 
 public class Community {
-	private ArrayList<Ville> cities;
-	private ArrayList<Route> routes;
+	ArrayList<Ville> cities;
+	ArrayList<Route> routes;
 
 	public Community() {
 		cities = new ArrayList<>();
@@ -76,13 +76,14 @@ public class Community {
 	    for (Route route : routes) {
 	        Ville city1 = route.getCity1();
 	        Ville city2 = route.getCity2();
-
-	        if ((city1.hasZoneDeRecharge() && !city2.hasZoneDeRecharge())
-	                || (!city1.hasZoneDeRecharge() && city2.hasZoneDeRecharge())) {
-	            if (findVille(removedCity.getName()).hasZoneDeRecharge()) {
-	                return false; // Violation found, removal of the zone would break accessibility
-	            }
-	        }
+			if(removedCity.equals(city1) || removedCity.equals(city2)){
+				if ((city1.hasZoneDeRecharge() && !city2.hasZoneDeRecharge()) || (!city1.hasZoneDeRecharge() && city2.hasZoneDeRecharge())) {
+	            	if (findVille(removedCity.getName()).hasZoneDeRecharge()) {
+	            	    return false; // Violation found, removal of the zone would break accessibility
+	            	}
+	        	}
+			}
+	        
 	    }
 	    return true; // No violation found, removal is allowed
 	}
