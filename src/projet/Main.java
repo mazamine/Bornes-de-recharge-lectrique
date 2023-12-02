@@ -47,8 +47,9 @@ public class Main {
 		
 		
 		int choice = 0;
+		/* 
 		String cityName;
-/* 
+ 
 		while (true) {
 			System.out.println("\nMenu principal :");
 			System.out.println("1. Ajouter une Ville");
@@ -161,6 +162,136 @@ public class Main {
 	}
 
 	public static void optimizeChargingZones(List<Ville> cities, List<Route> roads) {
+		Set<Ville> visited = new HashSet<>();
+		for (Ville city : cities) {
+			if (!visited.contains(city)) {
+				Set<Ville> group = new HashSet<>();
+				findConnectedCities(city, roads, group, visited);
+				
+				// Trouver la ville la plus stratégique pour la recharge dans le groupe
+				Ville strategicCity = findStrategicCity(group, roads);
+				
+				// Activer la zone de recharge pour la ville stratégique
+				strategicCity.setZoneDeRecharge(true);
+			}
+		}
+	}
+	
+	private static void findConnectedCities(Ville city, List<Route> roads, Set<Ville> group, Set<Ville> visited) {
+		visited.add(city);
+		group.add(city);
+		
+		for (Route road : roads) {
+			if (road.getCity1().equals(city) && !visited.contains(road.getCity2())) {
+				findConnectedCities(road.getCity2(), roads, group, visited);
+			} else if (road.getCity2().equals(city) && !visited.contains(road.getCity1())) {
+				findConnectedCities(road.getCity1(), roads, group, visited);
+			}
+		}
+	}
+	
+	private static Ville findStrategicCity(Set<Ville> group, List<Route> roads) {
+		Ville strategicCity = null;
+		int minNeighborsWithCharge = Integer.MAX_VALUE;
+	
+		for (Ville city : group) {
+			int neighborsWithCharge = countNeighborsWithChargingZone(city, group, roads);
+	
+			if (neighborsWithCharge < minNeighborsWithCharge) {
+				minNeighborsWithCharge = neighborsWithCharge;
+				strategicCity = city;
+			}
+		}
+	
+		return strategicCity;
+	}
+	
+	private static int countNeighborsWithChargingZone(Ville city, Set<Ville> group, List<Route> roads) {
+		int count = 0;
+		for (Route road : roads) {
+			Ville neighbor = getNeighbor(city, road);
+			if (group.contains(neighbor) && neighbor.hasZoneDeRecharge()) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	private static Ville getNeighbor(Ville city, Route road) {
+		if (road.getCity1().equals(city)) {
+			return road.getCity2();
+		} else {
+			return road.getCity1();
+		}
+	}
+	//la fonction est censé faire le boulot mais elle est mal implémentéé "method not used locally"
+	private static List<Route> findMinimalSpanningTree(List<Ville> cities, List<Route> roads) {
+		List<Route> minimalSpanningTree = new ArrayList<>();
+	
+		Map<Ville, Ville> parentMap = new HashMap<>();
+		Map<Ville, Integer> rankMap = new HashMap<>();
+	
+		for (Ville city : cities) {
+			makeSet(city, parentMap, rankMap);
+		}
+	
+		for (Route road : roads) {
+			Ville city1 = road.getCity1();
+			Ville city2 = road.getCity2();
+	
+			Ville parent1 = find(city1, parentMap);
+			Ville parent2 = find(city2, parentMap);
+	
+			if (!parent1.equals(parent2)) {
+				minimalSpanningTree.add(road);
+				union(parent1, parent2, parentMap, rankMap);
+			}
+		}
+	
+		return minimalSpanningTree;
+	}
+//this method is never used locally
+	private static int countNeighborsWithChargingZone(Ville city, List<Ville> group, List<Route> roads) {
+		int count = 0;
+		for (Route road : roads) {
+			Ville neighbor = getNeighbor(city, road);
+			if (group.contains(neighbor) && neighbor.hasZoneDeRecharge()) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+    private static void makeSet(Ville city, Map<Ville, Ville> parentMap, Map<Ville, Integer> rankMap) {
+        parentMap.put(city, city);
+        rankMap.put(city, 0);
+    }
+
+    private static Ville find(Ville city, Map<Ville, Ville> parentMap) {
+        if (city != parentMap.get(city)) {
+            parentMap.put(city, find(parentMap.get(city), parentMap));
+        }
+        return parentMap.get(city);
+    }
+
+    private static void union(Ville city1, Ville city2, Map<Ville, Ville> parentMap, Map<Ville, Integer> rankMap) {
+        Ville parent1 = find(city1, parentMap);
+        Ville parent2 = find(city2, parentMap);
+
+        if (rankMap.get(parent1) > rankMap.get(parent2)) {
+            parentMap.put(parent2, parent1);
+        } else {
+            parentMap.put(parent1, parent2);
+            if (rankMap.get(parent1).equals(rankMap.get(parent2))) {
+                rankMap.put(parent2, rankMap.get(parent2) + 1);
+            }
+        }
+    }
+
+
+
+/* 
+	public static void optimizeChargingZones(List<Ville> cities, List<Route> roads) {
         for (Ville city : cities) {
             if (!city.hasZoneDeRecharge()) {
                 Set<Ville> neighbors = findNeighbors(city, roads);
@@ -175,6 +306,10 @@ public class Main {
             }
         }
     }
+
+
+
+	
 
     private static Set<Ville> findNeighbors(Ville city, List<Route> roads) {
         Set<Ville> neighbors = new HashSet<>();
@@ -196,7 +331,7 @@ public class Main {
         }
         return false;
     }
-	
+	*/
 	private static void executeCommand(String command, Community community) {
 		// Analyser la commande et extraire le nom de la fonction et les paramètres
 		String[] parts = command.split("\\(");
