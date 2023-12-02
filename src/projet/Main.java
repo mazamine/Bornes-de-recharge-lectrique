@@ -1,5 +1,6 @@
 package projet;
 
+import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -9,8 +10,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("Bienvenue dans le programme de configuration des zones de recharge.");
-
-		/*
+				/*
 		 * int numberOfCities = 0;
 		 * 
 		 * // Handle InputMismatchException // Handle InputMismatchException and
@@ -30,6 +30,20 @@ public class Main {
 		 */
 
 		Community community = new Community();
+		
+		String fileName = "D:/h.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				executeCommand(line, community);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		int choice = 0;
 		String cityName;
 
@@ -133,5 +147,47 @@ public class Main {
 		scanner.close();
 		System.out.println("Merci d'utiliser le programme.");
 		System.exit(0);
+	}
+	
+	private static void executeCommand(String command, Community community) {
+		// Analyser la commande et extraire le nom de la fonction et les paramètres
+		String[] parts = command.split("\\(");
+		if (parts.length >= 2) {
+			String functionName = parts[0].trim();
+			String[] params = parts[1].replaceAll("\\)", "").split(",");
+			for (int i = 0; i < params.length; i++) {
+				params[i] = params[i].trim();
+			}
+
+			// Exécuter la fonction en fonction du nom et des paramètres
+			switch (functionName) {
+			case "route":
+				if (params.length == 2) {
+					community.addRoute(params[0], params[1]);
+				} else {
+					System.out.println("Erreur : La fonction 'route' nécessite deux paramètres.");
+				}
+				break;
+			case "ville":
+				if (params.length == 1) {
+					community.addVille(params[0]);
+				} else {
+					System.out.println("Erreur : La fonction 'ville' nécessite un paramètre.");
+				}
+				break;
+			case "recharge":
+				if (params.length == 1) {
+					community.addRechargeZone(params[0]);
+				} else {
+					System.out.println("Erreur : La fonction 'zone' nécessite un paramètre.");
+				}
+				break;
+			// Add more cases for other functions if needed
+			default:
+				System.out.println("Erreur : Fonction inconnue - " + functionName);
+			}
+		} else {
+			System.out.println("Erreur : Syntaxe de commande incorrecte - " + command);
+		}
 	}
 }

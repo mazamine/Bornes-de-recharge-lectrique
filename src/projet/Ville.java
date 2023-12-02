@@ -6,7 +6,7 @@ public class Ville {
 
 	public Ville(String name) {
 		this.name = name;
-		zoneDeRecharge = true;
+		zoneDeRecharge = false;
 	}
 
 	public String getName() {
