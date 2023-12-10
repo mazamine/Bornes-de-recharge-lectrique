@@ -2,11 +2,11 @@ package projet;
 
 public class Ville {
 	private String name;
-	private boolean zoneDeRecharge;
+	private boolean hasZoneDeRecharge;
 
 	public Ville(String name) {
 		this.name = name;
-		zoneDeRecharge = false;
+		hasZoneDeRecharge = false;
 	}
 
 	public String getName() {
@@ -14,10 +14,14 @@ public class Ville {
 	}
 
 	public boolean hasZoneDeRecharge() {
-		return zoneDeRecharge;
+		return hasZoneDeRecharge;
 	}
 
-	public void setZoneDeRecharge(boolean zoneDeRecharge) {
-		this.zoneDeRecharge = zoneDeRecharge;
+	public void setZoneDeRecharge() {
+		hasZoneDeRecharge = true;
+	}
+
+	public void deleteZoneDeRecharge() {
+		hasZoneDeRecharge = false;
 	}
 }

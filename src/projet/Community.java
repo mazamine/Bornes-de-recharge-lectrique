@@ -43,7 +43,7 @@ public class Community {
 		Ville ville = findVille(city);
 		if (ville != null) {
 			if (!ville.hasZoneDeRecharge()) {
-				ville.setZoneDeRecharge(true);
+				ville.setZoneDeRecharge();
 				System.out.println("Zone de recharge ajoutée à la ville " + city + ".");
 			} else {
 				System.out.println("Cette ville a déjà une zone de recharge.");
@@ -58,7 +58,7 @@ public class Community {
 		if(isAccessibilityPreserved(ville)) {
 			if (ville != null) {
 				if (ville.hasZoneDeRecharge()) {
-					ville.setZoneDeRecharge(false);
+					ville.deleteZoneDeRecharge();;
 					System.out.println("Zone de recharge retirée de la ville " + city + ".");
 				} else {
 					System.out.println("Cette ville n'a pas une zone de recharge.");
@@ -70,6 +70,15 @@ public class Community {
 			System.out.println("impossible de supprimer cette ville");
 		}
 		
+	}
+
+	public boolean isAccessibilityPreserved(){
+		for(Ville city : cities){
+			if(!isAccessibilityPreserved(city)){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private boolean isAccessibilityPreserved(Ville removedCity) {
@@ -87,6 +96,8 @@ public class Community {
 	    }
 	    return true; // No violation found, removal is allowed
 	}
+
+
 
 	public void displayRechargeZones() {
 		System.out.println("Villes avec des zones de recharge :");
@@ -106,4 +117,72 @@ public class Community {
 		}
 		return null;
 	}
+	public void approximateSolution(int k) {
+        int i = 0;
+        int currentScore = getRechargeZonesCount();
+
+        while (i < k) {
+            Ville randomCity = getRandomCity();
+
+            if (randomCity.hasZoneDeRecharge()) {
+                randomCity.deleteZoneDeRecharge();
+            } else {
+                randomCity.setZoneDeRecharge();
+            }
+
+            if (getRechargeZonesCount() < currentScore) {
+                i = 0;
+                currentScore = getRechargeZonesCount();
+            } else {
+                i++;
+            }
+        }
+
+        // Vérifier et corriger la contrainte à la fin de l'algorithme
+        ensureAccessibility();
+    }
+
+    // ... (autres méthodes existantes)
+
+    private void ensureAccessibility() {
+        for (Ville city : cities) {
+            if (!city.hasZoneDeRecharge()) {
+                boolean hasAdjacentRechargeZone = false;
+
+                for (Route route : routes) {
+                    Ville city1 = route.getCity1();
+                    Ville city2 = route.getCity2();
+
+                    if (city.equals(city1) && city2.hasZoneDeRecharge()) {
+                        hasAdjacentRechargeZone = true;
+                        break;
+                    } else if (city.equals(city2) && city1.hasZoneDeRecharge()) {
+                        hasAdjacentRechargeZone = true;
+                        break;
+                    }
+                }
+
+                if (!hasAdjacentRechargeZone) {
+                    city.setZoneDeRecharge();
+                    System.out.println("Zone de recharge ajoutée à la ville " + city.getName() +
+                            " pour garantir l'accessibilité.");
+                }
+            }
+        }
+    }
+
+    private Ville getRandomCity() {
+        int randomIndex = (int) (Math.random() * cities.size());
+        return cities.get(randomIndex);
+    }
+
+    private int getRechargeZonesCount() {
+        int count = 0;
+        for (Ville ville : cities) {
+            if (ville.hasZoneDeRecharge()) {
+                count++;
+            }
+        }
+        return count;
+    }
 }
