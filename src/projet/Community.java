@@ -73,28 +73,35 @@ public class Community {
 	}
 
 	public boolean isAccessibilityPreserved(){
+		Ville city1, city2;
 		for(Ville city : cities){
-			if(!isAccessibilityPreserved(city)){
-				return false;
+			if(!city.hasZoneDeRecharge()){
+				for(Route route : routes){
+					city1 = route.getCity1();
+					city2 = route.getCity2();
+					if((city1.equals(city) && !city2.hasZoneDeRecharge()) || (city2.equals(city) && !city1.hasZoneDeRecharge())) {
+						return false;
+					}
+					
+				}
 			}
 		}
 		return true;
 	}
 	
-	private boolean isAccessibilityPreserved(Ville removedCity) {
-	    for (Route route : routes) {
-	        Ville city1 = route.getCity1();
-	        Ville city2 = route.getCity2();
-			if(removedCity.equals(city1) || removedCity.equals(city2)){
-				if ((city1.hasZoneDeRecharge() && !city2.hasZoneDeRecharge()) || (!city1.hasZoneDeRecharge() && city2.hasZoneDeRecharge())) {
-	            	if (findVille(removedCity.getName()).hasZoneDeRecharge()) {
-	            	    return false; // Violation found, removal of the zone would break accessibility
-	            	}
-	        	}
+	private boolean isAccessibilityPreserved(Ville city) {
+		if(!city.hasZoneDeRecharge()){
+			Ville city1, city2;
+			for(Route route : routes){
+				city1 = route.getCity1();
+				city2 = route.getCity2();
+				if((city1.equals(city) && !city2.hasZoneDeRecharge()) || (city2.equals(city) && !city1.hasZoneDeRecharge())) {
+					return false;
+				}
+					
 			}
-	        
-	    }
-	    return true; // No violation found, removal is allowed
+		}
+		return true;
 	}
 
 

@@ -11,18 +11,15 @@ public class Main {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);
+		// pour le scanner
 		Community community = new Community();
 
 		// l'emplacement du fichier (pttr je vais le changer en .env )
 		String fileName = "/workspaces/Projet_PAA/src/h.txt";
 
-		// pour le scanner
-		int choice = 0;
-
 		// Il test si il y a un problème avec le fichier .txt
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
-
 			// si il ne trouve aucun problème, il l'execute ligne par ligne
 			while ((line = br.readLine()) != null) {
 				executeCommand(line, community);
@@ -33,16 +30,11 @@ public class Main {
 			System.out.println("Fichier non trouver!\nVeuillez entrer les villes manuellement");
 
 			// Sinon il demande d'entrer les données manuellement
-			inputCities(community);
+			inputCities(community, scanner);
 		}
 
 		System.out.println("Bienvenue dans le programme de configuration des zones de recharge.");
 		System.out.println("\nConfiguration initiale avec une zone de recharge dans chaque ville :");
-
-		// Il optimise les zones de recharges
-		//optimizeChargingZones(community.cities, community.routes);
-
-		// Puis il les affiche
         community.displayRechargeZones();
 
         // Ajout de la résolution automatique avec l'algorithme d'approximation
@@ -54,9 +46,16 @@ public class Main {
         community.displayRechargeZones();
 
 		// c'est pour les modifier manuellement
+		inputZonesDeRecharge(community, scanner);
+		
+		scanner.close();
+		System.out.println("Merci d'utiliser le programme.");
+		System.exit(0);
+	}
+
+	private static void inputZonesDeRecharge(Community community, Scanner scanner){
+		int choice = 0;
 		while (true) {
-			// Remets choice à 0
-			choice = 0;
 			// Menu
 			System.out.println("\nMenu de gestion des zones de recharge :");
 			System.out.println("1. Ajouter une zone de recharge");
@@ -90,8 +89,9 @@ public class Main {
 						if (choice == 1) {
 							break;
 						} else if (choice == 2) {
-							inputCities(community);
-							continue;
+							inputCities(community, scanner);
+							inputZonesDeRecharge(community, scanner);
+							return;
 						}
 					} else {
 						break;
@@ -106,9 +106,6 @@ public class Main {
 			community.displayRechargeZones();
 		}
 
-		scanner.close();
-		System.out.println("Merci d'utiliser le programme.");
-		System.exit(0);
 	}
 
 	private static void executeCommand(String command, Community community) {
@@ -153,11 +150,10 @@ public class Main {
 		}
 	}
 
-	private static void inputCities(Community community) {
+	private static void inputCities(Community community, Scanner scanner) {
 
 		int choice;
 		String cityName;
-		Scanner scanner = new Scanner(System.in);
 
 		while (true) {
 			System.out.println("\nMenu principal :");
@@ -216,6 +212,5 @@ public class Main {
 				break;
 			}
 		}
-		scanner.close();
 	}
 }
