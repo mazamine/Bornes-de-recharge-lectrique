@@ -12,22 +12,33 @@ public class Community {
 	}
 
 	public void addVille(String name) {
-		Ville newVille = new Ville(name);
-		if (cities.contains(newVille)) {
+		if (cities.contains(findVille(name))) {
 			System.out.println("Cette ville existe déjà.");
 		} else {
+			Ville newVille = new Ville(name);
 			cities.add(newVille);
+			System.out.println("Ville : " + newVille.getName() + " est ajoutée.");
 		}
 	}
+
+	 public void removeVille (String name) {
+		if (!cities.contains(findVille(name))) {
+			System.out.println("Ville inexistante.");
+		}
+		else{
+			removeRoute(findVille(name));
+			System.out.println("La ville " + name + " a été supprimée.");
+			cities.remove(findVille(name));
+			}
+		}
 
 	public void addRoute(String city1, String city2) {
 		Ville ville1 = findVille(city1);
 		Ville ville2 = findVille(city2);
 
-		if (ville1 != null && ville2 != null) {
+		if (ville1 != null && ville2 != null && !ville1.equals(ville2)) {
 			for (Route route : routes) {
-				if ((route.getCity1().equals(ville1) && route.getCity2().equals(ville2))
-						|| (route.getCity1().equals(ville2) && route.getCity2().equals(ville1))) {
+				if ((route.getCity1().equals(ville1) && route.getCity2().equals(ville2)) || (route.getCity1().equals(ville2) && route.getCity2().equals(ville1))) {
 					System.out.println("Cette route existe déjà.");
 					return;
 				}
@@ -39,7 +50,24 @@ public class Community {
 		}
 	}
 
-	public void addRechargeZone(String city) {
+	private void removeRoute(Ville city) {
+		for(Route route : routes){
+			if(route.getCity1().equals(city)||route.getCity2().equals(city)) {
+				routes.remove(route);
+			}
+		}
+	}
+
+	public void removeRoute(String city1, String city2) {
+		for(Route route : routes){
+			if((route.getCity1().equals(findVille(city1))&&route.getCity2().equals(findVille(city2)))||(route.getCity1().equals(findVille(city2))&&route.getCity2().equals(findVille(city1)))) {
+				routes.remove(route);
+				System.out.println("Route entre les villes " + city1 + " et " + city2 + " est suprrimée.");
+			}
+		}
+	}
+
+	public void addZoneDeRecharge(String city) {
 		Ville ville = findVille(city);
 		if (ville != null) {
 			if (!ville.hasZoneDeRecharge()) {
@@ -53,7 +81,7 @@ public class Community {
 		}
 	}
 
-	public void deleteRechargeZone(String city) {
+	public void deleteZoneDeRecharge(String city) {
 		Ville ville = findVille(city);
 		if(isAccessibilityPreserved(ville)) {
 			if (ville != null) {
@@ -72,7 +100,7 @@ public class Community {
 		
 	}
 
-	public boolean isAccessibilityPreserved(){
+	public boolean isAccessibilityPreserved() {
 		Ville city1, city2;
 		for(Ville city : cities){
 			if(!city.hasZoneDeRecharge()){
@@ -104,8 +132,6 @@ public class Community {
 		return true;
 	}
 
-
-
 	public void displayRechargeZones() {
 		System.out.println("Villes avec des zones de recharge :");
 		for (Ville ville : cities) {
@@ -124,6 +150,25 @@ public class Community {
 		}
 		return null;
 	}
+
+	// Algo 1
+	public void naiveApproximation(int k) {
+        int i = 0;
+        
+        while (i < k) {
+            Ville randomCity = getRandomCity();
+
+            if (randomCity.hasZoneDeRecharge()) {
+                randomCity.deleteZoneDeRecharge();
+            } else {
+                randomCity.setZoneDeRecharge();
+            }
+
+            i++;
+        }
+    }
+
+	// Algo 2
 	public void approximateSolution(int k) {
         int i = 0;
         int currentScore = getRechargeZonesCount();
@@ -144,12 +189,8 @@ public class Community {
                 i++;
             }
         }
-
-        // Vérifier et corriger la contrainte à la fin de l'algorithme
-        ensureAccessibility();
+        ensureAccessibility();// Vérifier et corriger la contrainte à la fin de l'algorithme
     }
-
-    // ... (autres méthodes existantes)
 
     private void ensureAccessibility() {
         for (Ville city : cities) {

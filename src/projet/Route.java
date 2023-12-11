@@ -8,9 +8,6 @@ public class Route {
 		this.city2 = city2;
 	}
 
-	public Route(String nomVille1, String nomVille2) {
-	}
-
 	public Ville getCity1() {
 		return city1;
 	}

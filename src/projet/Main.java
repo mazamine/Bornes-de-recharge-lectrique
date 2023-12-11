@@ -34,12 +34,24 @@ public class Main {
 		}
 
 		System.out.println("Bienvenue dans le programme de configuration des zones de recharge.");
+		System.out.println("souhaitez vous modifier ce programme? y/n");
+		if(scanner.nextLine().equals("y")){
+			inputCities(community, scanner);
+		}
+
+		System.out.println("Comment voulez vous résoudre le problème?");
+		System.out.println("1. résoudre manuellement;");
+		System.out.println("2. résoudre automatiquement;");
+
+
 		System.out.println("\nConfiguration initiale avec une zone de recharge dans chaque ville :");
         community.displayRechargeZones();
 
-        // Ajout de la résolution automatique avec l'algorithme d'approximation
-        System.out.println("\nRésolution automatique avec l'algorithme d'approximation :");
-        community.approximateSolution(1000); // Vous pouvez ajuster le nombre d'itérations selon vos besoins
+		System.out.println("\nRésolution naïve avec l'algorithme  d'approximation(naïf) :");
+		community.naiveApproximation(100);
+
+        System.out.println("\nRésolution automatique avec l'algorithme d'approximation (un peu moins naïf ) :");
+        community.approximateSolution(4); // Vous pouvez ajuster le nombre d'itérations selon vos besoins
 
         // Affichage du résultat
         System.out.println("\nConfiguration finale :");
@@ -49,6 +61,11 @@ public class Main {
 		inputZonesDeRecharge(community, scanner);
 		
 		scanner.close();
+		
+		//////////////////////////////////////////////////////////////////
+		System.out.println("Voulez vous sauvgarder cette solution?y/n");
+		//////////////////////////////////////////////////////////////////
+
 		System.out.println("Merci d'utiliser le programme.");
 		System.exit(0);
 	}
@@ -76,11 +93,11 @@ public class Main {
 			if (choice == 1) {
 				System.out.print("Veuillez entrer la ville où ajouter une zone de recharge : ");
 				String city = scanner.nextLine();
-				community.addRechargeZone(city);
+				community.addZoneDeRecharge(city);
 			} else if (choice == 2) {
 				System.out.print("Veuillez entrer la ville où retirer une zone de recharge : ");
 				String city = scanner.nextLine();
-				community.deleteRechargeZone(city);
+				community.deleteZoneDeRecharge(city);
 			} else if (choice == 3) {
 					if (!community.isAccessibilityPreserved()) {
 						System.err.println("Erreur : le Systèm de Zones de recharge de ces ville n'est pas correcte");
@@ -136,7 +153,7 @@ public class Main {
 				break;
 			case "recharge":
 				if (params.length == 1) {
-					community.addRechargeZone(params[0]);
+					community.addZoneDeRecharge(params[0]);
 				} else {
 					System.out.println("Erreur : La fonction 'zone' nécessite un paramètre.");
 				}
@@ -158,7 +175,8 @@ public class Main {
 		while (true) {
 			System.out.println("\nMenu principal :");
 			System.out.println("1. Ajouter une Ville");
-			System.out.println("2. Terminer la configuration");
+			System.out.println("2. supprimer une ville");
+			System.out.println("3. Terminer la configuration");
 
 			try {
 				choice = scanner.nextInt();
@@ -172,8 +190,11 @@ public class Main {
 				System.out.print("Entrez son nom : ");
 				cityName = scanner.nextLine();
 				community.addVille(cityName);
-			} else if (choice == 2) {
-
+			}else if (choice == 2) {
+				System.out.print("Entrez son nom : ");
+				cityName = scanner.nextLine();
+				community.removeVille(cityName);
+			} else if (choice == 3) {
 				break;
 			} else {
 				System.out.println("Choix non valide !");
@@ -186,7 +207,8 @@ public class Main {
 		while (true) {
 			System.out.println("\nMenu principal :");
 			System.out.println("1. Ajouter une route");
-			System.out.println("2. Terminer la configuration");
+			System.out.println("2. Supprimer une route");
+			System.out.println("3. Terminer la configuration");
 
 			// Handle InputMismatchException
 			try {
@@ -207,8 +229,16 @@ public class Main {
 				} else {
 					System.out.println("Entrée invalide. Veuillez entrer deux villes différentes.");
 				}
-			}
-			if (choice == 2) {
+			} else if (choice == 2) {
+				System.out.print("Veuillez entrer les villes entre lesquelles supprimer une route (par exemple, A B) : ");
+				String input = scanner.nextLine();
+				String[] cities = input.split(" ");
+				if (cities.length == 2 && !cities[0].equals(cities[1])) {
+					community.removeRoute(cities[0], cities[1]);
+				} else {
+					System.out.println("Entrée invalide. Veuillez entrer deux villes différentes.");
+				}
+			} else if (choice == 3) {
 				break;
 			}
 		}
