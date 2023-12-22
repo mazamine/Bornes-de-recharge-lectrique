@@ -1,27 +1,32 @@
 package projet;
 
+import java.util.Objects;
+
+//Déclaration de la classe Ville
 public class Ville {
-	private String name;
-	private boolean hasZoneDeRecharge;
-
-	public Ville(String name) {
-		this.name = name;
-		hasZoneDeRecharge = false;
+	private String nom;
+	public Ville(String nom) {
+		this.nom=nom;
 	}
-
-	public String getName() {
-		return name;
+	public Ville() {
+		
 	}
-
-	public boolean hasZoneDeRecharge() {
-		return hasZoneDeRecharge;
+	public String getNom() {
+		return nom;
 	}
-
-	public void setZoneDeRecharge() {
-		hasZoneDeRecharge = true;
+	public void setNom(String nom) {
+		this.nom=nom;
 	}
-
-	public void deleteZoneDeRecharge() {
-		hasZoneDeRecharge = false;
-	}
+	// Méthode equals pour vérifier l'égalité entre deux objets de type Ville
+    @Override
+	public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Ville ville = (Ville) obj;
+        return Objects.equals(nom, ville.nom);
+    }
 }

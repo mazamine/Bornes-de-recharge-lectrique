@@ -1,246 +1,181 @@
 package projet;
 
-// Libraries
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
-	public static void main(String[] args) {
-
-		Scanner scanner = new Scanner(System.in);
-		// pour le scanner
-		Community community = new Community();
-
-		// l'emplacement du fichier (pttr je vais le changer en .env )
-		String fileName = "/workspaces/Projet_PAA/src/h.txt";
-
-		// Il test si il y a un problème avec le fichier .txt
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-			String line;
-			// si il ne trouve aucun problème, il l'execute ligne par ligne
-			while ((line = br.readLine()) != null) {
-				executeCommand(line, community);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Fichier non trouver!\nVeuillez entrer les villes manuellement");
-
-			// Sinon il demande d'entrer les données manuellement
-			inputCities(community, scanner);
+	public static void main(String [] args) {
+		CA communaute = new CA();
+		Scanner scanner=new Scanner(System.in);
+		int reponse;
+	    String cheminFichier;
+		if (args.length != 1) {
+			System.err.println("Veuillez spécifier le chemin du fichier en argument.");
+			System.out.println("Entrez le chemain du fichier :");
+			cheminFichier = scanner.nextLine();
+	    }else{
+			cheminFichier = args[0];
 		}
-
-		System.out.println("Bienvenue dans le programme de configuration des zones de recharge.");
-		System.out.println("souhaitez vous modifier ce programme? y/n");
-		if(scanner.nextLine().equals("y")){
-			inputCities(community, scanner);
+	    File fichier = new File(cheminFichier);
+	    try {
+	    	communaute.lectureFichier(fichier);
+	    } catch (IOException e) {
+			System.out.println(e.getMessage());
 		}
-
-		System.out.println("Comment voulez vous résoudre le problème?");
-		System.out.println("1. résoudre manuellement;");
-		System.out.println("2. résoudre automatiquement;");
-
-
-		System.out.println("\nConfiguration initiale avec une zone de recharge dans chaque ville :");
-        community.displayRechargeZones();
-
-		System.out.println("\nRésolution naïve avec l'algorithme  d'approximation(naïf) :");
-		community.naiveApproximation(100);
-
-        System.out.println("\nRésolution automatique avec l'algorithme d'approximation (un peu moins naïf ) :");
-        community.approximateSolution(4); // Vous pouvez ajuster le nombre d'itérations selon vos besoins
-
-        // Affichage du résultat
-        System.out.println("\nConfiguration finale :");
-        community.displayRechargeZones();
-
-		// c'est pour les modifier manuellement
-		inputZonesDeRecharge(community, scanner);
-		
-		scanner.close();
-		
-		//////////////////////////////////////////////////////////////////
-		System.out.println("Voulez vous sauvgarder cette solution?y/n");
-		//////////////////////////////////////////////////////////////////
-
-		System.out.println("Merci d'utiliser le programme.");
-		System.exit(0);
-	}
-
-	private static void inputZonesDeRecharge(Community community, Scanner scanner){
-		int choice = 0;
-		while (true) {
-			// Menu
-			System.out.println("\nMenu de gestion des zones de recharge :");
-			System.out.println("1. Ajouter une zone de recharge");
-			System.out.println("2. Retirer une zone de recharge");
-			System.out.println("3. Terminer");
-
-			// Handle InputMismatchException
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
-			} catch (InputMismatchException e) {
-				System.out.println("Choix non valide. Veuillez entrer un nombre entier.");
-				scanner.nextLine(); // Clear the input buffer
-				continue; // Continue the loop to allow the user to enter a valid choice
-			}
-
-			// J'ai utilisé if et pas switch pour pouvoir utiliser break pour sortir de la boucle
-			if (choice == 1) {
-				System.out.print("Veuillez entrer la ville où ajouter une zone de recharge : ");
-				String city = scanner.nextLine();
-				community.addZoneDeRecharge(city);
-			} else if (choice == 2) {
-				System.out.print("Veuillez entrer la ville où retirer une zone de recharge : ");
-				String city = scanner.nextLine();
-				community.deleteZoneDeRecharge(city);
-			} else if (choice == 3) {
-					if (!community.isAccessibilityPreserved()) {
-						System.err.println("Erreur : le Systèm de Zones de recharge de ces ville n'est pas correcte");
-						System.out.println("Voulez vous arreter comme meme le programme?\n1. oui\n2. non");
-						choice = scanner.nextInt();
-						if (choice == 1) {
+	  
+	    do { 
+			menu1();
+			reponse = lectureEntier(scanner,"Votre choix: ");
+			switch(reponse) {
+			case 1: 
+				do { 
+					menu2();
+					reponse = lectureEntier(scanner,"Votre choix: ");
+					switch(reponse) {
+					case 1:
+						try {
+							String villeSource,villeCible;
+							villeSource=lectureString(scanner, "La ville source est: ");
+							villeCible=lectureString(scanner, "La ville cible est: ");
+							Route route = new Route(new Ville(villeSource),new Ville(villeCible));
+							communaute.ajouterRoute(route);
 							break;
-						} else if (choice == 2) {
-							inputCities(community, scanner);
-							inputZonesDeRecharge(community, scanner);
-							return;
+						} catch (InvalidInputException e ) {
+							System.out.println(e.getMessage());
 						}
-					} else {
+					case 2:
+						break;
+					default: 
+						System.out.println("Votre choix "+ reponse+ " n'est pas valide");
 						break;
 					}
+				}while (reponse != 2);
 				
+				do {
+					if(!communaute.accessibiliteVerifiee()) {
+						communaute.initBorneDeRecharge();
+					}
+					communaute.afficherVillesAvecRecharge();
+					menu3();
+					reponse = lectureEntier(scanner,"Votre choix: ");
+					switch(reponse) {
+					case 1:
+						try {
+							String ville = lectureString(scanner,"La ville est: ");
+							communaute.ajouterBorneDeRecharge(new Ville(ville));
+							break;
+						} catch (InvalidInputException e ) {
+							System.out.println(e.getMessage());
+						}
+					case 2:
+						try {
+							String ville = lectureString(scanner,"La ville est: ");
+							communaute.supprimerBorneRecharge(new Ville(ville));
+							break;
+						} catch (InvalidInputException e ) {
+							System.out.println(e.getMessage());
+						}
+					case 3: 
+						break;
+					default: 
+						System.out.println("Votre choix "+ reponse+ " n'est pas valide");
+						break;
+					}
+				}while(reponse != 3);
 				break;
-			} else {
-				System.out.println("Choix non valide. Veuillez réessayer.");
-			}
-
-			System.out.println("\nConfiguration actuelle :");
-			community.displayRechargeZones();
-		}
-
-	}
-
-	private static void executeCommand(String command, Community community) {
-		// Analyser la commande et extraire le nom de la fonction et les paramètres
-		String[] parts = command.split("\\(");
-		if (parts.length >= 2) {
-			String functionName = parts[0].trim();
-			String[] params = parts[1].replaceAll("\\)", "").split(",");
-			for (int i = 0; i < params.length; i++) {
-				params[i] = params[i].trim();
-			}
-
-			// Exécuter la fonction en fonction du nom et des paramètres
-			switch (functionName) {
-			case "route":
-				if (params.length == 2) {
-					community.addRoute(params[0], params[1]);
-				} else {
-					System.out.println("Erreur : La fonction 'route' nécessite deux paramètres.");
+			case 2: 
+				if(!communaute.accessibiliteVerifiee()) {
+					communaute.initBorneDeRecharge();
+				}
+				communaute.optimiserBornes();
+				System.out.println("avant l'amélioration");
+				communaute.afficherVillesAvecRecharge();
+				
+				communaute.ameliorerOptimisation();
+				System.out.println("après l'amélioration");
+				communaute.afficherVillesAvecRecharge();
+				break;
+			case 3: 
+				System.out.println("Saisir le chemin vers le fichier où la solution doit etre enregistrée: ");
+				String chemin = scanner.next();
+				try {
+					communaute.ecritureDansFichier(chemin);
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
 				}
 				break;
-			case "ville":
-				if (params.length == 1) {
-					community.addVille(params[0]);
-				} else {
-					System.out.println("Erreur : La fonction 'ville' nécessite un paramètre.");
-				}
+			case 4: 
 				break;
-			case "recharge":
-				if (params.length == 1) {
-					community.addZoneDeRecharge(params[0]);
-				} else {
-					System.out.println("Erreur : La fonction 'zone' nécessite un paramètre.");
-				}
+			default: 
+				System.out.println("Votre choix "+ reponse+ " n'est pas valide");
 				break;
-			// Add more cases for other functions if needed
-			default:
-				System.out.println("Erreur : Fonction inconnue - " + functionName);
 			}
-		} else {
-			System.out.println("Erreur : Syntaxe de commande incorrecte - " + command);
-		}
-	}
-
-	private static void inputCities(Community community, Scanner scanner) {
-
-		int choice;
-		String cityName;
-
-		while (true) {
-			System.out.println("\nMenu principal :");
-			System.out.println("1. Ajouter une Ville");
-			System.out.println("2. supprimer une ville");
-			System.out.println("3. Terminer la configuration");
-
+		} while (reponse !=4);
+	 }		
+				
+	
+/* cette méthode vérifie si ce qui a été saisi est bien un entier 
+ * sinon lève une exception 
+ * et demande à l'utilisateur de resaisir un entier 
+ */
+	private static int lectureEntier(Scanner scanner, String message) {
+		int res = 0;
+		boolean lectureValide = false;
+		while(!lectureValide) {
 			try {
-				choice = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
+				System.out.println(message);
+				res=scanner.nextInt();
+				lectureValide=true;
 			} catch (InputMismatchException e) {
-				System.out.println("Entree invalide. Veuillez entrer un nombre entier.");
-				scanner.nextLine(); // Clear the input buffer
-				continue;
-			}
-			if (choice == 1) {
-				System.out.print("Entrez son nom : ");
-				cityName = scanner.nextLine();
-				community.addVille(cityName);
-			}else if (choice == 2) {
-				System.out.print("Entrez son nom : ");
-				cityName = scanner.nextLine();
-				community.removeVille(cityName);
-			} else if (choice == 3) {
-				break;
-			} else {
-				System.out.println("Choix non valide !");
-			}
-
-		}
-
-		choice = 0;
-
-		while (true) {
-			System.out.println("\nMenu principal :");
-			System.out.println("1. Ajouter une route");
-			System.out.println("2. Supprimer une route");
-			System.out.println("3. Terminer la configuration");
-
-			// Handle InputMismatchException
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
-			} catch (InputMismatchException e) {
-				System.out.println("Choix non valide. Veuillez entrer un nombre entier.");
-				scanner.nextLine(); // Clear the input buffer
-				continue; // Continue the loop to allow the user to enter a valid choice
-			}
-
-			if (choice == 1) {
-				System.out.print("Veuillez entrer les villes entre lesquelles ajouter une route (par exemple, A B) : ");
-				String input = scanner.nextLine();
-				String[] cities = input.split(" ");
-				if (cities.length == 2 && !cities[0].equals(cities[1])) {
-					community.addRoute(cities[0], cities[1]);
-				} else {
-					System.out.println("Entrée invalide. Veuillez entrer deux villes différentes.");
-				}
-			} else if (choice == 2) {
-				System.out.print("Veuillez entrer les villes entre lesquelles supprimer une route (par exemple, A B) : ");
-				String input = scanner.nextLine();
-				String[] cities = input.split(" ");
-				if (cities.length == 2 && !cities[0].equals(cities[1])) {
-					community.removeRoute(cities[0], cities[1]);
-				} else {
-					System.out.println("Entrée invalide. Veuillez entrer deux villes différentes.");
-				}
-			} else if (choice == 3) {
-				break;
+				System.out.println("Il faut taper un nombre entier");
+				scanner.nextLine();				
 			}
 		}
+		return res;
 	}
+/* cette méthode vérifie si ce qui a été saisi est bien un String 
+ * sinon lève une exception 
+ * et demande à l'utilisateur de resaisir une chaine de caractère 
+ */
+	private static String lectureString(Scanner scanner, String message) throws InputMismatchException {
+		String res =" " ;
+		boolean lectureValide = false;
+		while(!lectureValide) {
+			try {
+				System.out.println(message);
+				res=scanner.next();
+				if (!res.matches("[a-zA-Z]+")) {
+	                throw new InputMismatchException("Il faut taper une chaine de caractère contenant le nom de la ville");
+	            }
+	            lectureValide = true;
+			} catch (InputMismatchException e) {
+				System.out.println("Il faut taper une chaine de caractère contenant le nom de la ville");
+				scanner.nextLine();				
+			}
+		}
+		return res;
+	}
+
+	private static void menu1() {
+		System.out.println("Tapez: ");
+		System.out.println("1: Résoudre manuellement;");
+		System.out.println("2: Résoudre automatiquement;");
+		System.out.println("3: Sauvegarder;");
+		System.out.println("4: Fin.");
+	}
+	private static void menu2() {
+		System.out.println("Tapez: ");
+		System.out.println("1: Ajouter une route ");
+		System.out.println("2: Fin");
+	}
+	
+	private static void menu3() {
+		System.out.println("Tapez: ");
+		System.out.println("1: Ajouter une zone de recharge ");
+		System.out.println("2: Retirer une zone de recharge ");	
+		System.out.println("3: Fin");
+	}
+	
 }
