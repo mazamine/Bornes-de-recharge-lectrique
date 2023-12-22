@@ -30,11 +30,20 @@ Ce projet utilise le [**java 17**](https://docs.oracle.com/en/java/javase/17/)
 3. Clique droit sur le fichier.
 4. Sélectionnez "*copy path*".
 
+## Execution
+### Sur Terminal
+1. Installer java sur votre machine (JRE 17 ou plus).
+2. Copier ces commandes :
+    - Compiler : `javac −d bin src/projet/Main.java` 
+    - Executer : `java −cp bin Main`
+### Sur IDE
+- Télécharger les extensions de Java 17.
+
 ## Contact
 
 Pour toute question ou collaboration, n'hésitez pas à contacter les membres de l'équipe :
 
-- Mohamed El Amine MAZOUZ: [mohamed-el-amine.mazouz@etu.u-paris.fr](mailto:mohamed-el-amine.mazouz@etu.u-paris.fr)
-- Melissa MERABET: [melissa.merabet@etu.u-paris.fr](mailto:melissa.merabet@etu.u-paris.fr)
-- Wassim BOUCHEKHCHOUKHA: [wassim.bouchekhchoukha@etu.u-paris.fr](mailto:wassim.bouchekhchoukha@etu.u-paris.fr)
-- GitHub : [https://github.com/mazamine999/Projet_PAA](https://github.com/mazamine999/Projet_PAA)
+- Mohamed El Amine MAZOUZ: [mohamed-el-amine.mazouz@etu.u-paris.fr](mailto:mohamed-el-amine.mazouz@etu.u-paris.fr).
+- Melissa MERABET: [melissa.merabet@etu.u-paris.fr](mailto:melissa.merabet@etu.u-paris.fr).
+- Wassim BOUCHEKHCHOUKHA: [wassim.bouchekhchoukha@etu.u-paris.fr](mailto:wassim.bouchekhchoukha@etu.u-paris.fr).
+- GitHub : [https://github.com/mazamine999/Projet_PAA](https://github.com/mazamine999/Projet_PAA).
