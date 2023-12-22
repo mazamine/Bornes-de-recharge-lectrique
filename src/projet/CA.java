@@ -392,7 +392,7 @@ public class CA {
 			try {
 				supprimerBorneRecharge(ville);
 			} catch (InvalidInputException e) {
-				System.out.println("On ne peut pas améliorer mieux que ça");
+				continue;
 			}
 		}
 	}

@@ -14,7 +14,7 @@ public class Main {
 		String cheminFichier;
 
 		if (args.length != 1) {
-			System.out.println("Entrez le chemain du fichier :");
+			System.out.println("Entrez le chemin du fichier :");
 			cheminFichier = scanner.nextLine();
 		} else {
 			cheminFichier = args[0];
@@ -91,11 +91,7 @@ public class Main {
 					communaute.initBorneDeRecharge();
 				}
 				communaute.optimiserBornes();
-				System.out.println("avant l'amélioration");
-				communaute.afficherVillesAvecRecharge();
-
 				communaute.ameliorerOptimisation();
-				System.out.println("après l'amélioration");
 				communaute.afficherVillesAvecRecharge();
 				break;
 			case 3:
